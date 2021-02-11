@@ -110,10 +110,9 @@ nats = 0:inclist(nats)
 --- ### fib
 
 --this works for any given fib but MUST USE addpairs and create an infinite list
+
 fib :: [Integer]
-fib 1 = 1
-fib 2 = 1
-fib n = fib (n-1) + fib (n-2)
+fib = 1:1:2:addpairs (tail(fib)) ( tail(tail(fib)) )
 
 
 --- Set Theory
