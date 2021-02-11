@@ -67,8 +67,8 @@ inclist (x:xs) = x + 1 : inclist (xs)
 --- ### sumlist
 
 sumlist :: Num a => [a] -> a
-sumList [] = 0
-sumList (x:xs) = x + sumList xs
+sumlist [] = 0
+sumlist (x:xs) = x + sumlist xs
 
 --- ### myzip
 
@@ -112,7 +112,7 @@ nats = 0:inclist(nats)
 --this works for any given fib but MUST USE addpairs and create an infinite list
 
 fib :: [Integer]
-fib = 1:1:2:addpairs (tail(fib)) ( tail(tail(fib)) )
+fib = 0:1:1:addpairs (tail(fib)) ( tail(tail(fib)) )
 
 
 --- Set Theory
@@ -139,7 +139,6 @@ union (x:xs) (y:ys) | x < y = x:union (xs) (y:ys)
 --- ### intersect
 
 intersect :: Ord a => [a] -> [a] -> [a]
-intersect :: Ord a => [a] -> [a] -> [a]
 intersect [] [] = []
 intersect x [] = []
 intersect [] y = []
@@ -160,9 +159,10 @@ powerset = undefined
 inc x = x+1
 
 inclist' :: Num a => [a] -> [a]
-inclist' = map inc
+inclist' = P.map inc
 
 --- ### sumlist'
+plus a b = a+b
 
 sumlist' :: (Num a) => [a] -> a
-sumlist' = foldr (\a b -> plus a b) 0
+sumlist' = P.foldr (\a b -> plus a b) 0
