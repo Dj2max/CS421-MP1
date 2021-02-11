@@ -42,8 +42,13 @@ mydrop a (x:xs) | a <= 0 = (x:xs)
 
 --- ### rev
 
+rev_helper :: [a] -> [a] -> [a]
+rev_helper retval [] = retval
+rev_helper retval (y:ys) = rev_helper (y:retval) ys
+
 rev :: [a] -> [a]
-rev = undefined
+rev [] = []
+rev (x:xs) = rev_helper [] (x:xs)
 
 --- ### app
 
