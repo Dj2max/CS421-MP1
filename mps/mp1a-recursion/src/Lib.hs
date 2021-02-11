@@ -139,7 +139,14 @@ union (x:xs) (y:ys) | x < y = x:union (xs) (y:ys)
 --- ### intersect
 
 intersect :: Ord a => [a] -> [a] -> [a]
-intersect = undefined
+intersect :: Ord a => [a] -> [a] -> [a]
+intersect [] [] = []
+intersect x [] = []
+intersect [] y = []
+intersect (x:xs) (y:ys)
+    | x == y = x:intersect (xs) (ys)
+    | x < y = intersect (xs) (y:ys)
+    | y < x = intersect (x:xs) (ys)
 
 --- ### powerset
 
