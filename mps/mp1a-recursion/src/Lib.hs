@@ -123,12 +123,18 @@ fib = 1:1:2:addpairs (tail(fib)) ( tail(tail(fib)) )
 add :: Ord a => a -> [a] -> [a]
 add x [] = [x]
 add x (y:ys) | x < y = x:y:ys
-             | otherwise = y:add(x ys)
+             | x == y = x:ys
+             | otherwise = y:add x ys
 
 --- ### union
 
 union :: Ord a => [a] -> [a] -> [a]
-union = undefined
+union [] [] = []
+union x [] = x
+union [] y = y 
+union (x:xs) (y:ys) | x < y = x:union (xs) (y:ys)
+                    | x == y = x:union (xs) (ys)
+                    | otherwise = y:union (x:xs) (ys) 
 
 --- ### intersect
 
