@@ -53,7 +53,10 @@ rev (x:xs) = rev_helper [] (x:xs)
 --- ### app
 
 app :: [a] -> [a] -> [a]
-app = undefined
+app [] [] = []
+app x [] = x
+app [] y = y
+app (x:xs) y = x:(app xs y)
 
 --- ### inclist
 
