@@ -72,8 +72,7 @@ sumList (x:xs) = x + sumList xs
 
 --- ### myzip
 
---probably wrong
-myzip :: [a] -> [b] -> [(a,b)]
+myzip :: [a] -> [b] -> [(a, b)]
 myzip [] [] = []
 myzip x [] = []
 myzip [] y = []
@@ -82,10 +81,21 @@ myzip (x:xs) (y:ys) = ( (x, y)  : myzip (xs) (ys) )
 
 --- ### addpairs
 
---doesnt work yet
+myzip_help :: [a] -> [a] -> [(a, a)] -- this should only be called by actualadd or things where they must be the same type
+myzip_help [] [] = []
+myzip_help x [] = []
+myzip_help [] y = []
+myzip_help (x:xs) (y:ys) = ( (x, y)  : myzip_help (xs) (ys) )
+
+actualadd :: (Num a) => [(a, a)] -> [a]
+actualadd [] = []
+actualadd (x:xs) = ( fst(x) + snd(x) : actualadd (xs) ) 
+
 addpairs :: (Num a) => [a] -> [a] -> [a]
-addpairs [] = []
-addpairs (x:xs) (y:ys) = myzip((x:xs) (y:ys))
+addpairs [] [] = []
+addpairs x [] = []
+addpairs [] y = []
+addpairs (x:xs) (y:ys) = actualadd(myzip_help (x:xs) (y:ys))
 
 --- ### ones
 
