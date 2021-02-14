@@ -1,3 +1,5 @@
+--dmackey2
+--kedaruk2
 --- Getting Started
 --- ===============
 
@@ -40,13 +42,17 @@ cons2list (Cons i l) = i:(cons2list l)
 
 -- don't forget to put the type declaration or you will lose points!
 eval :: Exp -> Integer
-eval = undefined
+eval (IntExp x) = x
+eval (PlusExp []) = 0
+eval (MultExp []) = 1
+eval (PlusExp (x:xs)) = (eval x) + (eval (PlusExp xs))
+eval (MultExp (x:xs)) =  (eval x) * (eval (MultExp xs))
 
 --- ### list2cons'
 
 -- don't forget to put the type declaration or you will lose points!
 list2cons' :: [a] -> List a
-list2cons' = undefined
+list2cons' = foldr (\a b -> Cons a (b)) Nil
 
 --- ### BinTree
 
