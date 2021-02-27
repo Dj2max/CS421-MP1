@@ -97,6 +97,8 @@ liftCompOp _ _ _ = ExnVal "Cannot lift"
 
 --- Eval
 --- ----
+mv1byv2 env pair = H.insert (fst pair) (eval (snd pair) env) env
+
 
 eval :: Exp -> Env -> Val
 
@@ -136,22 +138,29 @@ eval (CompOpExp op e1 e2) env =
           in liftCompOp f v1 v2
 
 --- ### If Expressions
-
-eval (IfExp (BoolExp e1) e2 e3) env | eval (BoolExp e1) env == BoolVal 1 =  eval e2 env
-                                    | otherwise = eval e3 env
+--eval (IfExp (BoolExp e1) e2 e3) env = undefined
+eval (IfExp e1 e2 e3) env | eval e1 env == (BoolVal True) =  eval e2 env
+                          | eval e1 env == (BoolVal False) = eval e3 env
 eval (IfExp _ _ _) env = ExnVal "Condition is not a Bool"
 
 
 
 --- ### Functions and Function Application
 
-eval (FunExp params body) env = undefined
+eval (FunExp params body) env = CloVal params body env
 
 eval (AppExp e1 args) env = undefined
+--    let CloVal params body clenv = eval e1 env
+--        arg = eval args env
+--     in eval $ body $ ((params,arg):clenv)
 
 --- ### Let Expressions
 
-eval (LetExp pairs body) env = undefined
+eval (LetExp [] body) env = eval body env
+
+eval (LetExp pairs body) env = 
+    let v1 = map (mv1byv2 env) pairs
+        in eval body (last(map (H.union (head v1)) (tail v1)))
 
 --- Statements
 --- ----------
@@ -166,6 +175,9 @@ exec (PrintStmt e) penv env = (val, penv, env)
 --- ### Set Statements
 
 exec (SetStmt var e) penv env = undefined
+    --case H.lookup s env of 
+    --    Just s -> 
+    --    Nothing -> 
 
 --- ### Sequencing
 
