@@ -99,6 +99,9 @@ liftCompOp _ _ _ = ExnVal "Cannot lift"
 --- ----
 mv1byv2 env pair = H.insert (fst pair) (eval (snd pair) env) env
 
+recunion [] a = a
+recunion (x:xs) a = recunion xs (H.union x a)  
+
 
 eval :: Exp -> Env -> Val
 
@@ -160,7 +163,8 @@ eval (LetExp [] body) env = eval body env
 
 eval (LetExp pairs body) env = 
     let v1 = map (mv1byv2 env) pairs
-        in eval body (last(map (H.union (head v1)) (tail v1)))
+        env1 = recunion v1 (head v1)
+        in eval body env1
 
 --- Statements
 --- ----------
