@@ -161,10 +161,9 @@ eval (AppExp e1 args) env = undefined
 
 eval (LetExp [] body) env = eval body env
 
-eval (LetExp pairs body) env = 
-    let v1 = map (mv1byv2 env) pairs
-        env1 = recunion v1 (head v1)
-        in eval body env1
+eval (LetExp (pair:pairs) body) env = 
+    eval (LetExp pairs body) (H.insert (fst pair) (eval (snd pair) env) env)
+
 
 --- Statements
 --- ----------
@@ -178,14 +177,17 @@ exec (PrintStmt e) penv env = (val, penv, env)
 
 --- ### Set Statements
 
-exec (SetStmt var e) penv env = undefined
-    --case H.lookup s env of 
-    --    Just s -> 
-    --    Nothing -> 
+exec (SetStmt var e) penv env = 
+    let e1 = eval e env
+        env1 = H.insert var e1 env
+     in ("", penv, env1)
 
 --- ### Sequencing
 
 exec (SeqStmt []) penv env = undefined
+    ("", penv, env)
+
+--exec (SeqStmt x:xs) penv env = ("", penv, env)
 
 --- ### If Statements
 
