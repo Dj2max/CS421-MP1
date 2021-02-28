@@ -152,21 +152,43 @@ eval (IfExp _ _ _) env = ExnVal "Condition is not a Bool"
 
 eval (FunExp params body) env = CloVal params body env
 
-eval (AppExp e1 args) env = undefined
---    let CloVal params body clenv = eval e1 env
---        arg = eval args env
---     in eval $ body $ ((params,arg):clenv)
+eval (AppExp (FunExp _ body) []) env = eval body env
+
+eval (AppExp (FunExp (param:params) body) (val:vals)) env = eval (AppExp (FunExp params body) vals) (H.insert param (eval val env) env)
+eval (AppExp  (VarExp e1) vals) env =
+    let CloVal params body env1 = eval (VarExp e1) env
+    in eval (AppExp (FunExp params body) vals) env1
+eval (AppExp _ _) env = ExnVal "Apply to non-closure"
+--eval (AppExp e1 []) env =
+--    let CloVal params body env1 = eval e1 env
+--    in eval body env
+
+--eval (AppExp e1 (val:vals)) env = 
+--    let CloVal (param:params) body env1 = eval e1 env
+--    in eval (AppExp (FunExp params body) vals) (H.insert param (eval val env) env)
+
+
+
 
 --- ### Let Expressions
 
 eval (LetExp [] body) env = eval body env
 
 eval (LetExp (pair:pairs) body) env = 
-    eval (LetExp pairs body) (H.insert (fst pair) (eval (snd pair) env) env)
+    eval (LetExp (pairs) body) (H.insert (fst pair) (eval (snd pair) env) env)
 
 
 --- Statements
 --- ----------
+seqtailhelp [] a penv env = a
+seqtailhelp ((PrintStmt x):xs) a penv env = seqtailhelp xs (a ++ (show $ eval x env)) penv env
+seqtailhelp ((SetStmt var x):xs) a penv env = seqtailhelp xs (a) penv env
+seqtailhelp ((SeqStmt x):xs) a penv env = seqtailhelp xs (a ++ (seqtailhelp x "" penv env)) penv env
+--seqtailhelp ((IfStmt  e1 s1 s2):xs) a penv env
+--    | eval e1 env == BoolVal True = seqtailhelp xs (a ++ exec s1 penv env) penv env
+--    | eval e1 env == BoolVal True = seqtailhelp xs (a ++ exec s2 penv env) penv env
+--    | otherwise = seqtailhelp xs (a ++ "exn: Condition is not a Bool") penv env
+
 
 -- Statement Execution
 -- -------------------
@@ -184,17 +206,30 @@ exec (SetStmt var e) penv env =
 
 --- ### Sequencing
 
-exec (SeqStmt []) penv env = undefined
-    ("", penv, env)
+exec (SeqStmt []) penv env = 
+    let x = ""
+    in (x, penv, env)
+
+exec (SeqStmt (x:xs)) penv env = 
+    let y = seqtailhelp  (x:xs) "" penv env
+    in (y,penv,env)
+
 
 --exec (SeqStmt x:xs) penv env = ("", penv, env)
 
 --- ### If Statements
 
-exec (IfStmt e1 s1 s2) penv env = undefined
+exec (IfStmt e1 s1 s2) penv env
+    | eval e1 env == BoolVal True = exec s1 penv env
+    | eval e1 env == BoolVal False = exec s2 penv env
+    | otherwise = ("exn: Condition is not a Bool", penv, env)
 
 --- ### Procedure and Call Statements
 
-exec p@(ProcedureStmt name args body) penv env = undefined
+exec p@(ProcedureStmt name args body) penv env = ("", (H.insert name p penv), env)
 
-exec (CallStmt name args) penv env = undefined
+exec (CallStmt name args) penv env = 
+    case H.lookup name penv of 
+        Just name -> (val, penv, env)
+            where val = AppExp (FunExp args name) env)
+        Nothing -> ("Procedure " ++ name ++ " undefined",penv,env)
